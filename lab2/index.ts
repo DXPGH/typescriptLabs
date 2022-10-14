@@ -62,9 +62,9 @@ interface Lifespan {
 type PersonSpan = Person & Lifespan;
 
 const p: Person = {
-    firstName: "Danny",
-    lastName: "Phongsouthy"
-}
+  firstName: "Danny",
+  lastName: "Phongsouthy",
+};
 
 const ps: PersonSpan = {
   firstName: "Alan",
@@ -128,8 +128,8 @@ console.log(tupleExample1[0] + " || " + tupleExample1[1]);
 // ~~~~~~~~~~~~~~~
 
 interface Cylinder {
-    radius: number;
-    height: number;
+  radius: number;
+  height: number;
 }
 // const Cylinder = (radius: number, height:number) => ({radius, height});
 // interface Cylinder is in the type space
@@ -144,15 +144,15 @@ interface Cylinder {
 // Generally symbols after a type or interface are in type space while those introduced in a const or let declaration are values.
 
 class Cylinder {
-    radius = 1;
-    height=1;
+  radius = 1;
+  height = 1;
 }
 
-function calculateVolume(shape: unknown){
-    if (shape instanceof Cylinder){
-        shape // OK, type is Cylinder
-        shape.radius // OK, type is number
-    }
+function calculateVolume(shape: unknown) {
+  if (shape instanceof Cylinder) {
+    shape; // OK, type is Cylinder
+    shape.radius; // OK, type is number
+  }
 }
 
 type T1 = typeof p; // Type is Person
@@ -165,25 +165,22 @@ const v2 = typeof calculateVolume; // Value is "function"
 // ~~~~~~~~~~~~~~~
 
 type regularPerson = {
-    name: string;
-}
+  name: string;
+};
 
 // Type is Person. This is Type Declaration. This is more preferred
-const alice: regularPerson = {name: "Alice"}; 
+const alice: regularPerson = { name: "Alice" };
 
 // Type is Person. This is Type Assertion
-const bob = {name: "Bob"} as regularPerson;
+const bob = { name: "Bob" } as regularPerson;
 
 // Type Assertion will silence errors by telling the type checker that, for whatever reason, you know better than it does.
 
-
 // Example of how to do Type Declaration on a function
-const people = ['alice', 'bob', 'jan'].map(
-    (name): regularPerson => ({name}));
+const people = ["alice", "bob", "jan"].map((name): regularPerson => ({ name }));
 
-// Another Example of Type Declaration 
-const people1: regularPerson[] = ['alice', 'bob', 'jan'].map(
-    (name): regularPerson => ({name}));
+// Another Example of Type Declaration
+const people1: regularPerson[] = ["alice", "bob", "jan"].map((name): regularPerson => ({ name }));
 
 // One instance of needing to use Type Assertion however is when you truly do know more about a type than TypeScript does, this could be typically about a DOM element.
 // document.querySelector('#myButton').addeventListener('click', e => {
@@ -214,5 +211,145 @@ const people1: regularPerson[] = ['alice', 'bob', 'jan'].map(
 
 // ~~~~~~~~~~~~~~~
 // Item11: Recognize the Limits of Excess Property Checking
+// ~~~~~~~~~~~~~~~
+
+interface Room {
+  numDoors: number;
+  ceilingHeightFt: number;
+}
+
+const obj = {
+  numDoors: 1,
+  ceilingHeightFt: 10,
+  elephant: "present",
+};
+const r: Room = obj; // OK
+
+interface Options {
+  title: string;
+  darkMode?: boolean;
+}
+function createWindow(options: Options) {
+  if (options.darkMode) {
+    setDarkMode();
+  }
+  // ...
+}
+function setDarkMode(): boolean {
+  let darkMode: boolean = true;
+  return darkMode;
+}
+createWindow({
+  title: "Spider Solitaire",
+  darkMode: true,
+});
+
+const o: Options = { darkMode: true, title: "Ski Free" };
+
+const o1: Options = { darkmode: true, title: "Ski Free" } as Options; // OK
+
+// You can tell TypeScript to expect additional properties using an index signature [otherOptions: string]: unknown
+interface Options2 {
+  darkMode?: boolean;
+  [otherOptions: string]: unknown;
+}
+const o2: Options2 = { darkmode: true }; // OK
+
+// interface LineChartOptions {
+//     logscale?: boolean;
+//     invertedYAxis?: boolean;
+//     areaChart?: boolean;
+// }
+// const opts = {logScale: true}; // Problem line as logScale is not a property of LineChartOptions
+// const o3: LineChartOptions = opts;
+
+// ~~~~~~~~~~~~~~~
+// Item12: Apply Types to Entire Function Expressions When Possible
+// ~~~~~~~~~~~~~~~
+
+function rollDice1(sides: number): number {
+  /* ... */
+  return 1;
+} // Statement
+const rollDice2 = function (sides: number): number {
+  /* ... */
+  return 2;
+}; // Expression
+const rollDice3 = (sides: number): number => {
+  /* ... */
+  return 3;
+}; // Also Expression
+
+// The advantage of function expressions in TypeScript is that you can apply a type declaration to the entire function at once
+
+type DiceRollFn = (sides: number) => number;
+const rollDice: DiceRollFn = (sides) => {
+  /* ... */
+  return 4;
+};
+
+// As statement you would need to declare each variable type each time
+function add1(a: number, b: number) {
+  return a + b;
+}
+function sub1(a: number, b: number) {
+  return a - b;
+}
+function mul1(a: number, b: number) {
+  return a * b;
+}
+function div1(a: number, b: number) {
+  return a / b;
+}
+
+// But as an expression you would just need to do it once
+type BinaryFn = (a: number, b: number) => number;
+const add2: BinaryFn = (a, b) => a + b;
+const sub2: BinaryFn = (a, b) => a - b;
+const mul2: BinaryFn = (a, b) => a * b;
+const div2: BinaryFn = (a, b) => a / b;
+
+console.log(add2(1, 2)); // 3
+console.log(sub2(2, 1)); // 1
+console.log(mul2(2, 2)); // 4
+
+// You extract data from the response via response.json() or response.text()
+// async function getQuote() {
+//   const response = await fetch("/quote?by=Mark+Twain");
+//   const quote = await response.json();
+//   return quote;
+// }
+
+// Type declarations for fetch
+// declare function fetch(
+//     input: RequestInfo, init?: RequestInit
+//    ): Promise<Response>;
+
+// This is how you write checkedFetch
+// async function checkedFetch(input: RequestInfo, init?: RequestInit) {
+//     const response = await fetch(input, init);
+//     if (!response.ok) {
+//     // Converted to a rejected Promise in an async function
+//     throw new Error('Request failed: ' + response.status);
+//     }
+//     return response;
+//    }
+
+// But it can be written more concisely
+// const checkedFetch: typeof fetch = async (input, init) => {
+//   const response = await fetch(input, init);
+//   if (!response.ok) {
+//     throw new Error("Request failed: " + response.status);
+//   }
+//   return response;
+// };
+// In this change we went from a function statement to a function expression and applied a type (typeof fetch) to the entire function
+
+// Takeaways: 
+//      If writing the same type signature repeatedly, factor out a function type or look for an existing one. If you're a library author, provide types for common callbacks.
+//      Use typeof fn to match the signature of another function
+
+// ~~~~~~~~~~~~~~~
+// Item13: Know the Differences Between type and interface
 // ~~~~~~~~~~~~~~~
 

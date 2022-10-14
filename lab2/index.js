@@ -1,5 +1,7 @@
 // Chapter 2 TypeScript's Type System
+// ~~~~~~~~~~~~~~~
 // Item6: Use Your Editor to Interrogate the Explore the Type System
+// ~~~~~~~~~~~~~~~
 var num = 10;
 function add(a, b) {
     return a + b;
@@ -76,3 +78,81 @@ function calculateVolume(shape) {
 }
 var v1 = typeof p; // Value is "object"
 var v2 = typeof calculateVolume; // Value is "function"
+// Type is Person. This is Type Declaration. This is more preferred
+var alice = { name: "Alice" };
+// Type is Person. This is Type Assertion
+var bob = { name: "Bob" };
+// Type Assertion will silence errors by telling the type checker that, for whatever reason, you know better than it does.
+// Example of how to do Type Declaration on a function
+var people = ["alice", "bob", "jan"].map(function (name) { return ({ name: name }); });
+// Another Example of Type Declaration
+var people1 = ["alice", "bob", "jan"].map(function (name) { return ({ name: name }); });
+var obj = {
+    numDoors: 1,
+    ceilingHeightFt: 10,
+    elephant: "present"
+};
+var r = obj; // OK
+function createWindow(options) {
+    if (options.darkMode) {
+        setDarkMode();
+    }
+    // ...
+}
+function setDarkMode() {
+    var darkMode = true;
+    return darkMode;
+}
+createWindow({
+    title: "Spider Solitaire",
+    darkMode: true
+});
+var o = { darkMode: true, title: "Ski Free" };
+var o1 = { darkmode: true, title: "Ski Free" }; // OK
+var o2 = { darkmode: true }; // OK
+// interface LineChartOptions {
+//     logscale?: boolean;
+//     invertedYAxis?: boolean;
+//     areaChart?: boolean;
+// }
+// const opts = {logScale: true}; // Problem line as logScale is not a property of LineChartOptions
+// const o3: LineChartOptions = opts;
+// ~~~~~~~~~~~~~~~
+// Item12: Apply Types to Entire Function Expressions When Possible
+// ~~~~~~~~~~~~~~~
+function rollDice1(sides) {
+    /* ... */
+    return 1;
+} // Statement
+var rollDice2 = function (sides) {
+    /* ... */
+    return 2;
+}; // Expression
+var rollDice3 = function (sides) {
+    /* ... */
+    return 3;
+}; // Also Expression
+var rollDice = function (sides) {
+    /* ... */
+    return 4;
+};
+// As statement you would need to declare each variable type each time
+function add1(a, b) {
+    return a + b;
+}
+function sub1(a, b) {
+    return a - b;
+}
+function mul1(a, b) {
+    return a * b;
+}
+function div1(a, b) {
+    return a / b;
+}
+var add2 = function (a, b) { return a + b; };
+var sub2 = function (a, b) { return a - b; };
+var mul2 = function (a, b) { return a * b; };
+var div2 = function (a, b) { return a / b; };
+console.log(add2(1, 2)); // 3
+console.log(sub2(2, 1)); // 1
+console.log(mul2(2, 2)); // 4

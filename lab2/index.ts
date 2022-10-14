@@ -1,6 +1,8 @@
 // Chapter 2 TypeScript's Type System
 
+// ~~~~~~~~~~~~~~~
 // Item6: Use Your Editor to Interrogate the Explore the Type System
+// ~~~~~~~~~~~~~~~
 
 let num: number = 10;
 function add(a: number, b: number) {
@@ -18,7 +20,9 @@ const foo = {
   },
 };
 
+// ~~~~~~~~~~~~~~~
 // Item7: Think of Types as Sets of Values
+// ~~~~~~~~~~~~~~~
 
 // const x: never = 12;
 // ~ Type '12' is not assignable to type 'never'
@@ -119,7 +123,9 @@ let tupleExample1: tupleExample[] = [
 
 console.log(tupleExample1[0] + " || " + tupleExample1[1]);
 
+// ~~~~~~~~~~~~~~~
 // Item8: Know How to Tell Whether a Symbol Is in the Type Space or Value Space
+// ~~~~~~~~~~~~~~~
 
 interface Cylinder {
     radius: number;
@@ -154,5 +160,48 @@ type T2 = typeof ps; // Type is Person & Lifespan
 const v1 = typeof p; // Value is "object"
 const v2 = typeof calculateVolume; // Value is "function"
 
+// ~~~~~~~~~~~~~~~
 // Item9: Prefer Type Declarations to Type Assertions
+// ~~~~~~~~~~~~~~~
+
+type regularPerson = {
+    name: string;
+}
+
+// Type is Person. This is Type Declaration. This is more preferred
+const alice: regularPerson = {name: "Alice"}; 
+
+// Type is Person. This is Type Assertion
+const bob = {name: "Bob"} as regularPerson;
+
+// Type Assertion will silence errors by telling the type checker that, for whatever reason, you know better than it does.
+
+
+// Example of how to do Type Declaration on a function
+const people = ['alice', 'bob', 'jan'].map(
+    (name): regularPerson => ({name}));
+
+// Another Example of Type Declaration 
+const people1: regularPerson[] = ['alice', 'bob', 'jan'].map(
+    (name): regularPerson => ({name}));
+
+// One instance of needing to use Type Assertion however is when you truly do know more about a type than TypeScript does, this could be typically about a DOM element.
+// document.querySelector('#myButton').addeventListener('click', e => {
+//     e.currentTarget // Type is EventTarget
+//     const button = e.currentTarget as HTMLButtonElement;
+//     button // Type is HTMLButtonElement
+// })
+// Because TypeScript doesn't have access to the DOM of your page, it has no way of knowing that #myButton is a button element
+
+// const elNull = document.getElementById('foo'); // Type is HTMLElement | null
+// const el = document.getElementById('foo')!; // Type is HTMLElement
+
+// Used as a prefix, ! is a boolean negation
+// But used as a suffix, ! is interpreted as an assertion
+
+// Prefer type declarations (: Type) to type assertions (as Type)
+
+// ~~~~~~~~~~~~~~~
+// Item10: Avoid Object Wrapper Types (String, Number, Boolean, Symbol, BigInt)
+// ~~~~~~~~~~~~~~~
 

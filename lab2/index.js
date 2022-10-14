@@ -156,3 +156,27 @@ var div2 = function (a, b) { return a / b; };
 console.log(add2(1, 2)); // 3
 console.log(sub2(2, 1)); // 1
 console.log(mul2(2, 2)); // 4
+var toStrT = function (x) { return "" + x; }; // OK
+var toStrI = function (x) { return "" + x; }; // OK
+var tpair = { first: 1, second: 2 };
+var ipair = { first: "1", second: "2" };
+// The caveat between these two is that an Interface cannot extend a complex type like a union type. If you want to do that, you'll need to use type and &
+// Class can also implement either an interface or a simple type:
+var StateT = /** @class */ (function () {
+    function StateT() {
+        this.name = "";
+        this.capital = "";
+    }
+    return StateT;
+}());
+var StateI = /** @class */ (function () {
+    function StateI() {
+        this.name = "";
+        this.capital = "";
+    }
+    return StateI;
+}());
+var pair = [1, 2];
+var stringList = ["1", "2", "3", "4", "5"];
+var namedNums = ['Named Numbers', 1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+var namedNums1 = ['Named Numbers', [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]];

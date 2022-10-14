@@ -345,11 +345,141 @@ console.log(mul2(2, 2)); // 4
 // };
 // In this change we went from a function statement to a function expression and applied a type (typeof fetch) to the entire function
 
-// Takeaways: 
+// Takeaways:
 //      If writing the same type signature repeatedly, factor out a function type or look for an existing one. If you're a library author, provide types for common callbacks.
 //      Use typeof fn to match the signature of another function
 
 // ~~~~~~~~~~~~~~~
 // Item13: Know the Differences Between type and interface
+// ~~~~~~~~~~~~~~~
+
+// If you want to defined a named type in TypeScript there are two options
+type TState = {
+  name: string;
+  capital: string;
+};
+
+interface IState {
+  name: string;
+  capital: string;
+}
+
+// You could also use a class, but that is a JavaScript runtime concept that also introduces a value
+
+// You can use index signature with both interface and type
+type TDict = { [key: string]: string };
+interface IDict {
+  [key: string]: string;
+}
+
+// You can also define function types with either
+type TFn = (x: number) => string;
+interface IFn {
+  (x: number): string;
+}
+
+const toStrT: TFn = (x) => "" + x; // OK
+const toStrI: IFn = (x) => "" + x; // OK
+
+type TFnWithProperties = {
+  (x: number): number;
+  prop: string;
+};
+interface IFnWithProperties {
+  (x: number): number;
+  prop: string;
+}
+
+// Both type and interfaces can be generic
+type TPair<T> = {
+  first: T;
+  second: T;
+};
+interface IPair<T> {
+  first: T;
+  second: T;
+}
+let tpair: TPair<number> = { first: 1, second: 2 };
+let ipair: IPair<string> = { first: "1", second: "2" };
+
+// Interface can extend a type, and a type can extend an interface
+interface IStateWithPop extends TState {
+  population: number;
+}
+type TStateWithPop = IState & { population: number };
+
+// The caveat between these two is that an Interface cannot extend a complex type like a union type. If you want to do that, you'll need to use type and &
+
+// Class can also implement either an interface or a simple type:
+class StateT implements TState {
+  name: string = "";
+  capital: string = "";
+}
+class StateI implements IState {
+  name: string = "";
+  capital: string = "";
+  population: number = 0;
+}
+
+// Now the differences first start with union types, there are no union interfaces
+type AorB = "a" | "b";
+
+// If you have separate types for Input and Output variables and a mapping from name to variable
+type Input = {
+  /* ... */
+};
+type Output = {
+  /* ... */
+};
+interface VariableMap {
+  [name: string]: Input | Output;
+}
+// then you might want a type that attaches the name to the variable
+type NamedVariable = (Input | Output) & { name: string };
+
+// In general a type is more capable than an interface
+// It can be a union, and it can also take advantage of more advanced features like mapped or conditional types.
+// It can also express tuple and array types more easily
+type Pair = [number, number];
+type StringList = string[];
+type NamedNums = [string, ...number[]];
+
+let pair: Pair = [1, 2];
+let stringList: StringList = ["1", "2", "3", "4", "5"];
+let namedNums = ["Named Numbers", 1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+let namedNums1 = ["Named Numbers", [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]];
+
+// You can express something like a tuple using interface:
+interface Tuple {
+  0: number;
+  1: number;
+  length: 2;
+}
+const t: Tuple = [10, 20]; // OK
+// But this is not ideal as it drops all the tuple methods like concat
+// So its better to use a type
+
+// Interface can be augmented
+interface IState {
+    name: string;
+    capital: string;
+}
+interface IState {
+    population: number;
+}
+const wyoming: IState = {
+    name: 'Wyoming',
+    capital: 'Cheyenne',
+    population: 500_000
+}; // OK
+// This is otherwise known as "declaration merging"
+
+// Takeaway from Item13: 
+//      Understand the differences and similarities of type and interface
+//      Know how to write either
+//      In deciding which to use within your project, consider the established style and whether augmentation might be beneficial.
+
+// ~~~~~~~~~~~~~~~
+// Item14: Use Type Operations and Generics to Avoid Repeating Yourself
 // ~~~~~~~~~~~~~~~
 

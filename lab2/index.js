@@ -22,12 +22,17 @@ var ab12 = ab; // OK, {"A", "B"} is a subset of {"A", "B", 12}
 var identified = {
     id: "identified"
 };
+var p = {
+    firstName: "Danny",
+    lastName: "Phongsouthy"
+};
 var ps = {
-    name: "Alan Turing",
+    firstName: "Alan",
+    lastName: "Turing",
     birth: new Date("1912/06/23"),
     death: new Date("1954/06/07")
 }; // OK
-console.log(ps.name + " " + "Birth " + ps.birth + "Death " + ps.death);
+console.log(ps.firstName + " " + "Birth " + ps.birth + "Death " + ps.death);
 function getKey(val, key) { }
 getKey({}, "x"); // OK, 'x' extends string
 getKey({}, Math.random() < 0.5 ? "a" : "b"); // OK, 'a'|'b' extends string
@@ -46,4 +51,28 @@ var tupleExample1 = [
     [2, "bloop", 2],
 ];
 console.log(tupleExample1[0] + " || " + tupleExample1[1]);
-// Item8: Know How to Tell Whether a Symbol Is in the Type Space or Value Space
+// const Cylinder = (radius: number, height:number) => ({radius, height});
+// interface Cylinder is in the type space
+// const Cylinder is in the value space
+// function calculateVolume(shape: unknown) {
+//     if (shape instanceof Cylinder) {
+//         shape.radius
+//         // ~~~ Property 'radius' does not exist on type '{}'
+//     }
+// }
+// Generally symbols after a type or interface are in type space while those introduced in a const or let declaration are values.
+var Cylinder = /** @class */ (function () {
+    function Cylinder() {
+        this.radius = 1;
+        this.height = 1;
+    }
+    return Cylinder;
+}());
+function calculateVolume(shape) {
+    if (shape instanceof Cylinder) {
+        shape; // OK, type is Cylinder
+        shape.radius; // OK, type is number
+    }
+}
+var v1 = typeof p; // Value is "object"
+var v2 = typeof calculateVolume; // Value is "function"

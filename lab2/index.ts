@@ -48,7 +48,8 @@ const identified: Identified = {
   id: "identified",
 };
 interface Person {
-  name: string;
+  firstName: string;
+  lastName: string;
 }
 interface Lifespan {
   birth: Date;
@@ -56,12 +57,18 @@ interface Lifespan {
 }
 type PersonSpan = Person & Lifespan;
 
+const p: Person = {
+    firstName: "Danny",
+    lastName: "Phongsouthy"
+}
+
 const ps: PersonSpan = {
-  name: "Alan Turing",
+  firstName: "Alan",
+  lastName: "Turing",
   birth: new Date("1912/06/23"),
   death: new Date("1954/06/07"),
 }; // OK
-console.log(ps.name + " " + "Birth " + ps.birth + "Death " + ps.death);
+console.log(ps.firstName + " " + "Birth " + ps.birth + "Death " + ps.death);
 
 // This is another common way of implementing the PersonSpan
 // interface PersonSpan extends Person {
@@ -113,4 +120,39 @@ let tupleExample1: tupleExample[] = [
 console.log(tupleExample1[0] + " || " + tupleExample1[1]);
 
 // Item8: Know How to Tell Whether a Symbol Is in the Type Space or Value Space
+
+interface Cylinder {
+    radius: number;
+    height: number;
+}
+// const Cylinder = (radius: number, height:number) => ({radius, height});
+// interface Cylinder is in the type space
+// const Cylinder is in the value space
+
+// function calculateVolume(shape: unknown) {
+//     if (shape instanceof Cylinder) {
+//         shape.radius
+//         // ~~~ Property 'radius' does not exist on type '{}'
+//     }
+// }
+// Generally symbols after a type or interface are in type space while those introduced in a const or let declaration are values.
+
+class Cylinder {
+    radius = 1;
+    height=1;
+}
+
+function calculateVolume(shape: unknown){
+    if (shape instanceof Cylinder){
+        shape // OK, type is Cylinder
+        shape.radius // OK, type is number
+    }
+}
+
+type T1 = typeof p; // Type is Person
+type T2 = typeof ps; // Type is Person & Lifespan
+const v1 = typeof p; // Value is "object"
+const v2 = typeof calculateVolume; // Value is "function"
+
+// Item9: Prefer Type Declarations to Type Assertions
 

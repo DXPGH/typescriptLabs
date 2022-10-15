@@ -624,10 +624,10 @@ const INIT_OPTIONS = {
   label: "VGA",
 };
 interface Other_Options {
-    width: number;
-    height: number;
-    color: string;
-    label: string;
+  width: number;
+  height: number;
+  color: string;
+  label: string;
 }
 // You can do so with typeof:
 type TOther_Options = typeof INIT_OPTIONS;
@@ -641,4 +641,3 @@ type TOther_Options = typeof INIT_OPTIONS;
 // ~~~~~~~~~~~~~~~
 // Item15: Use Index Signatures for Dynamic Data
 // ~~~~~~~~~~~~~~~
-

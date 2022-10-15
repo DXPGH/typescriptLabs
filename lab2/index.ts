@@ -461,25 +461,184 @@ const t: Tuple = [10, 20]; // OK
 
 // Interface can be augmented
 interface IState {
-    name: string;
-    capital: string;
+  name: string;
+  capital: string;
 }
 interface IState {
-    population: number;
+  population: number;
 }
 const wyoming: IState = {
-    name: 'Wyoming',
-    capital: 'Cheyenne',
-    population: 500_000
+  name: "Wyoming",
+  capital: "Cheyenne",
+  population: 500_000,
 }; // OK
 // This is otherwise known as "declaration merging"
 
-// Takeaway from Item13: 
+// Takeaway from Item13:
 //      Understand the differences and similarities of type and interface
 //      Know how to write either
 //      In deciding which to use within your project, consider the established style and whether augmentation might be beneficial.
 
 // ~~~~~~~~~~~~~~~
 // Item14: Use Type Operations and Generics to Avoid Repeating Yourself
+// ~~~~~~~~~~~~~~~
+
+// The script prints the dimensions, surface areas, and volumes of a few cylinders:
+
+// console.log('Cylinder 1 x 1 ',
+//  'Surface area:', 6.283185 * 1 * 1 + 6.283185 * 1 * 1,
+//  'Volume:', 3.14159 * 1 * 1 * 1);
+// console.log('Cylinder 1 x 2 ',
+//  'Surface area:', 6.283185 * 1 * 1 + 6.283185 * 2 * 1,
+//  'Volume:', 3.14159 * 1 * 2 * 1);
+// console.log('Cylinder 2 x 1 ',
+//  'Surface area:', 6.283185 * 2 * 1 + 6.283185 * 2 * 1,
+//  'Volume:', 3.14159 * 2 * 2 * 1);
+// This could easily fix that problem
+//  const surfaceArea = (r, h) => 2 * Math.PI * r * (r + h);
+//  const volume = (r, h) => Math.PI * r * r * h;
+//  for (const [r, h] of [[1, 1], [1, 2], [2, 1]]) {
+//   console.log(
+//   `Cylinder ${r} x ${h}`,
+//   `Surface area: ${surfaceArea(r, h)}`,
+//   `Volume: ${volume(r, h)}`);
+//  }
+
+// To reduce repetition is by naming your types.
+function distance(a: { x: number; y: number }, b: { x: number; y: number }) {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+}
+// create a name for the type and use that
+interface Point2D {
+  x: number;
+  y: number;
+}
+function distance1(a: Point2D, b: Point2D) {
+  return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+}
+
+// If several functions share the same type signature:
+// function get(url: string, opts: Options): Promise<Response> { /* ... */ }
+// function post(url: string, opts: Options): Promise<Response> { /* ... */ }
+
+// Then you can factor out a name type for this signature:
+// type HTTPFunction = (url: string, opts: Options) => Promise<Response>;
+// const get: HTTPFunction = (url, opts) => { /* ... */ };
+// const post: HTTPFunction = (url, opts) => { /* ... */ };
+
+interface Person {
+  firstName: string;
+  lastName: string;
+}
+
+// Instead of this
+// interface PersonWithBirthDate {
+//     firstName: string;
+//     lastName: string;
+//     birth: Date;
+// }
+// you can use:
+interface PersonWithBirthDate extends Person {
+  birth: Date;
+}
+
+// You can also use the & operator with types though this is less common
+type PersonWithBirthDate1 = Person & { birth: Date };
+
+interface State {
+  userID: string;
+  pageTitle: string;
+  recentFiles: string[];
+  pageContents: string;
+}
+// Instead of duplicating data
+// interface TopNavState {
+//     userID: string;
+//     pageTitle: string;
+// }
+
+// You can define TopNavState as a subset of State using fields from State
+// type TopNavState = {
+//     userID: State['userID'];
+//     pageTitle: State['pageTitle'];
+//     recentFiles: State['recentFiles'];
+// };
+
+// Although this is progress you can do better by using a mapped type
+// type Pick<T, K> = { [k in K]: T[k] };
+type TopNavState = Pick<State, "userID" | "pageTitle" | "recentFiles">;
+
+// Pick is an example of generic type
+
+// Now how do you deal with duplication in tagged unions
+interface SaveAction {
+  type: "save";
+  // ...
+}
+interface LoadAction {
+  type: "load";
+  // ...
+}
+type Action = SaveAction | LoadAction;
+// type ActionType = 'save' | 'load'; // Repeated types!
+
+type ActionType = Action["type"]; // Type is "save" | "load"
+type ActionRec = Pick<Action, "type">; // {type: "save" | "load"}
+
+// If defining a class which can be initialized and later updated, the type for the parameter to the update method will optionally include most of the same parameters as the constructor
+interface OptionsArg {
+  width: number;
+  height: number;
+  color: string;
+  label: string;
+}
+// interface OptionsUpdate {
+//   width?: number;
+//   height?: number;
+//   color?: string;
+//   label?: string;
+// }
+class UIWidget {
+  constructor(init: OptionsArg) {
+    /* ... */
+  }
+  // Line 612 is basically the same as Partial<OptionsArg>
+  update(options: Partial<OptionsArg>) {
+    /* ... */
+  }
+}
+
+// In this case you can construct OptionsUpdate from Options using a mapped type and keyof:
+type OptionsUpdate = { [k in keyof OptionsArg]?: OptionsArg[k] };
+// keyof takes a type and gives you a union of the types of its keys:
+
+type OptionsKeys = keyof Options;
+// Type is "width" | "height" | "color" | "label"
+
+// You may also find yourself wanting to define a type that matches the shape of a value:
+
+const INIT_OPTIONS = {
+  width: 640,
+  height: 480,
+  color: "#00FF00",
+  label: "VGA",
+};
+interface Other_Options {
+    width: number;
+    height: number;
+    color: string;
+    label: string;
+}
+// You can do so with typeof:
+type TOther_Options = typeof INIT_OPTIONS;
+
+// Takeaways from Item14
+//      DRY (Don't Repeat Yourself)
+//      Name types rather than repeating them. Use extends to avoid repeating fields in interfaces
+//      Understand tools in TypeScript to map between types. These include keyof, typeof, indexing, and mapped types.
+//      Familiarize wih generic types such as Pick, Partial, and ReturnType
+
+// ~~~~~~~~~~~~~~~
+// Item15: Use Index Signatures for Dynamic Data
 // ~~~~~~~~~~~~~~~
 
